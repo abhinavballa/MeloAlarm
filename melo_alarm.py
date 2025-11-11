@@ -15,6 +15,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+from typing import Optional
 
 # Load environment variables
 env_path = Path(__file__).parent / '.env'
@@ -23,7 +24,7 @@ load_dotenv(dotenv_path=env_path)
 # Spotify API credentials
 SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
-SPOTIFY_REDIRECT_URI = os.getenv('SPOTIFY_REDIRECT_URI', 'http://localhost:8888/callback')
+SPOTIFY_REDIRECT_URI = os.getenv('SPOTIFY_REDIRECT_URI', 'http://127.0.0.1:8888/callback')
 SPOTIFY_PLAYLIST_ID = os.getenv('SPOTIFY_PLAYLIST_ID')
 SPOTIFY_USERNAME = os.getenv('SPOTIFY_USERNAME')
 
@@ -117,6 +118,28 @@ def open_spotify_app():
         print("Please make sure Spotify is installed on your Mac")
 
 
+def wait_for_active_device(sp: spotipy.Spotify, timeout_seconds: int = 15) -> Optional[str]:
+    """
+    Poll for an active Spotify device for up to timeout_seconds.
+    Returns the device_id if found, otherwise None.
+    """
+    deadline = time.time() + timeout_seconds
+    last_seen_device_id = None
+    while time.time() < deadline:
+        try:
+            devices = sp.devices()
+            active_devices = [d for d in devices.get('devices', []) if d.get('is_active')]
+            if active_devices:
+                return active_devices[0].get('id')
+            # Keep the last seen device (even if inactive) to attempt transfer later
+            if devices.get('devices'):
+                last_seen_device_id = devices['devices'][0].get('id')
+        except Exception:
+            pass
+        time.sleep(1)
+    return last_seen_device_id
+
+
 def play_track(sp, track_uri, device_id=None):
     """Play a track on Spotify."""
     try:
@@ -125,17 +148,23 @@ def play_track(sp, track_uri, device_id=None):
         active_devices = [d for d in devices['devices'] if d['is_active']]
         
         if not active_devices and not device_id:
-            print("No active Spotify devices found.")
-            print("Please open Spotify and make sure it's playing on a device.")
-            return False
+            print("No active Spotify devices found. Attempting to open Spotify and wait for a device...")
+            open_spotify_app()
+            # Give Spotify a moment and poll for device availability
+            target_device = wait_for_active_device(sp, timeout_seconds=15)
+            if not target_device:
+                print("Still no active device after waiting. Will try transferring playback if possible...")
+            else:
+                device_id = target_device
         
         # Use the first active device or the specified device
-        target_device = device_id or active_devices[0]['id']
+        target_device = device_id or (active_devices[0]['id'] if active_devices else None)
         
-        # Start playback
-        sp.start_playback(device_id=target_device, uris=[track_uri])
-        print(f"Playing: {track_uri}")
-        return True
+        # Start playback if we have a target device
+        if target_device:
+            sp.start_playback(device_id=target_device, uris=[track_uri])
+            print(f"Playing: {track_uri}")
+            return True
     except Exception as e:
         print(f"Error playing track: {e}")
         # If playback fails, try to transfer playback to this computer
@@ -149,7 +178,13 @@ def play_track(sp, track_uri, device_id=None):
                 return True
         except Exception as transfer_error:
             print(f"Error transferring playback: {transfer_error}")
-        return False
+        # Final fallback: open the track directly with Spotify app (macOS)
+        try:
+            print("Opening track directly in Spotify app...")
+            subprocess.run(['open', track_uri], check=True)
+            return True
+        except Exception:
+            return False
 
 
 def is_interactive():

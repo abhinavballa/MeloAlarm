@@ -44,7 +44,7 @@ python3 melo_alarm.py
 4. Fill in the app details:
    - App name: "MeloAlarm" (or any name you like)
    - App description: "Alarm clock that plays Spotify playlists"
-   - Redirect URI: `http://localhost:8888/callback`
+   - Redirect URI: `http://127.0.0.1:8888/callback`
    - Accept the terms and click "Create"
 5. Copy your **Client ID** and **Client Secret**
 
@@ -80,7 +80,7 @@ pip install -r requirements.txt
    ```env
    SPOTIFY_CLIENT_ID=your_actual_client_id
    SPOTIFY_CLIENT_SECRET=your_actual_client_secret
-   SPOTIFY_REDIRECT_URI=http://localhost:8888/callback
+   SPOTIFY_REDIRECT_URI=http://127.0.0.1:8888/callback
    SPOTIFY_PLAYLIST_ID=your_playlist_id  # Optional: can also be provided via command-line
    SPOTIFY_USERNAME=your_spotify_username
    ```

@@ -2,28 +2,41 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>Label</key>
-    <string>com.meloalarm</string>
-    <key>ProgramArguments</key>
-    <array>
-        <string>/usr/bin/python3</string>
-        <string>/Users/abhi/Documents/GitHub/MeloAlarm/melo_alarm.py</string>
-    </array>
-    <key>StartCalendarInterval</key>
-    <dict>
-        <key>Hour</key>
-        <integer>9</integer>
-        <key>Minute</key>
-        <integer>0</integer>
-    </dict>
-    <key>StandardOutPath</key>
-    <string>/Users/abhi/Documents/GitHub/MeloAlarm/melo_alarm.log</string>
-    <key>StandardErrorPath</key>
-    <string>/Users/abhi/Documents/GitHub/MeloAlarm/melo_alarm.error.log</string>
-    <key>RunAtLoad</key>
-    <false/>
-    <key>KeepAlive</key>
-    <false/>
+	<key>Label</key>
+	<string>com.meloalarm</string>
+
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/abhi/.venvs/meloalarm/bin/python3</string>
+		<string>/Users/abhi/Library/Application Support/MeloAlarm/melo_alarm.py</string>
+
+	</array>
+
+	<key>WorkingDirectory</key>
+	<string>/Users/abhi/Library/Application Support/MeloAlarm</string>
+
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PYTHONUNBUFFERED</key>
+		<string>1</string>
+	</dict>
+
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>9</integer>
+		<key>Minute</key>
+		<integer>0</integer>
+	</dict>
+
+	<key>StandardOutPath</key>
+	<string>/Users/abhi/Library/Logs/MeloAlarm/melo_alarm.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/abhi/Library/Logs/MeloAlarm/melo_alarm.error.log</string>
+
+	<key>RunAtLoad</key>
+	<false/>
+	<key>KeepAlive</key>
+	<false/>
 </dict>
 </plist>
-
