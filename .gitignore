@@ -1,0 +1,33 @@
+# Environment variables
+.env
+
+# Spotify authentication cache
+.cache
+*.cache
+
+# Logs
+*.log
+melo_alarm.log
+melo_alarm.error.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
